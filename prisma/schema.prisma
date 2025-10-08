@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id        String       @id @default(uuid())
+  email     String       @unique
+  name      String?
+  secret    String
+  statusId  Int
+  rolesId   Int
+  companyId Int
+  createdAt DateTime     @default(now())
+  Attendace Attendaces[]
+  role      Roles        @relation(fields: [rolesId], references: [id])
+  company   Companies    @relation(fields: [companyId], references: [id])
+  status    Statuses     @relation(fields: [statusId], references: [id])
+}
+
+model Attendaces {
+  id      String   @id @default(uuid())
+  status  Int
+  desc    String?
+  date    DateTime
+  time    DateTime
+  lat     String
+  lng     String
+  userId  Users    @relation(fields: [usersId], references: [id])
+  usersId String
+}
+
+model Roles {
+  id    Int     @id @default(autoincrement())
+  name  String
+  desc  String
+  Users Users[]
+}
+
+model Companies {
+  id    Int     @id @default(autoincrement())
+  name  String
+  desc  String
+  Users Users[]
+}
+
+model Statuses {
+  id    Int     @id @default(autoincrement())
+  type  String
+  name  String
+  desc  String?
+  color String
+  Users Users[]
+}
